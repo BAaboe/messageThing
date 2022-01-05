@@ -32,28 +32,28 @@ class Client:
 
     def send(self):
         while True:
-            inp = input("")
+            inp = input()
 
             if inp == ":exit":
-                self.send(jsonMaker(500, "Disconnect"))
+                self.s.send(jsonMaker(500, "Disconnect").encode())
                 break
             else:
-                self.s.send(jsonMaker(111, inp))
+                self.s.send(jsonMaker(111, inp+" ").encode())
 
     def connection_loop(self):
         recv_thread = threading.Thread(target=self.recv_msg, daemon=True)
-        send_thread = threading.Thread(target=self.send, daemon=False)
+        send_thread = threading.Thread(target=self.send)
         recv_thread.start()
         send_thread.start()
 
     
     def connect(self):
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Tror det e en ting? får se ig.
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         if not self.name:
             self.name = input("Enter a name: ")
         
         self.s.connect((self.HOST, self.PORT))
-        self.s.sendall(self.name.decode())
+        self.s.sendall(self.name.encode())
         data = self.s.recv(1024).decode()
         data = json.loads(data)
         if not data["status"] == 100:
@@ -69,3 +69,6 @@ class Client:
 
         
         
+if __name__ == "__main__":
+    c = Client()
+    c.main()
