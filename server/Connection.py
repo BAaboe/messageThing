@@ -27,7 +27,6 @@ class Connection:
 
     def getThread(self):
         return self.thread
-    def setThread(slef, thread):
+    def setThread(self, thread):
         self.thread = thread
 
-    

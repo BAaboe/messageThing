@@ -4,8 +4,8 @@ from Connection import Connection
 import threading
 import json
 
-def jsonMaker(self, status, message):
-        return json.dumps({"status": status, "message":message})
+def jsonMaker(status, message):
+    return json.dumps({"status": status, "message":message})
 
 
 class RequestHandler():
@@ -13,25 +13,27 @@ class RequestHandler():
     def __init__(self):
         self.connected = []
 
-    def broacast(self, data):
+    def broadcast(self, data):
         for i in self.connected:
             i.conn.send(jsonMaker(110, data).encode())
-            recv = conn.recv(2048).decode()
+            recv = i.conn.recv(2048).decode()
             if recv != 100:
                 print("ehh, something is wrong")
-
-
 
     
     def connection_loop(self, connection):
         while True:
-            recv = conn.recv(2048).decode()
+            recv = connection.conn.recv(2048).decode()
             data = json.loads(recv)
 
             if data["status"] == 111:
-                self.broacast(data["message"])
+                self.broadcast(f"{connection.name}: {data['message']}")
+            elif data["status"] == 500:
+                self.connected.pop(connection)
+                connection.send(jsonMaker(500, "Disconnect"))
+                connection.conn.close()
+                self.broadcast(f"{connection.name} left")
             
-
 
     def authentication(self, conn, addr):
         try:
