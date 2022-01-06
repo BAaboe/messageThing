@@ -36,6 +36,7 @@ class Client:
 
             if inp == ":exit":
                 self.s.send(jsonMaker(500, "Disconnect").encode())
+                self.s.close()
                 break
             else:
                 self.s.send(jsonMaker(111, inp+" ").encode())
@@ -52,7 +53,11 @@ class Client:
         if not self.name:
             self.name = input("Enter a name: ")
         
-        self.s.connect((self.HOST, self.PORT))
+        try:
+            self.s.connect((self.HOST, self.PORT))
+        except ConnectionRefusedError as e:
+            print("Can't connect to server")
+
         self.s.sendall(self.name.encode())
         data = self.s.recv(1024).decode()
         data = json.loads(data)

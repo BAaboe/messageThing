@@ -1,6 +1,7 @@
 import threading
 from request_handler import RequestHandler
 import os
+from Connection import Connection
 
 
 def start():
@@ -13,7 +14,11 @@ def start():
     while True:
         inp = input()
         if inp == "exit":
+            nw.s.close()
             os._exit(0)
+        elif inp == "connected":
+            for i in nw.connected:
+                print(i.name)
         
 
 if __name__ == "__main__":
